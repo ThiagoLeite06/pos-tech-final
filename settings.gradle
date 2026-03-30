@@ -1,0 +1,3 @@
+rootProject.name = 'sus-receita'
+
+include 'api-gateway'

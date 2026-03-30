@@ -1,0 +1,51 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+*.launch
+.vscode/
+*.code-workspace
+
+# Spring Boot
+*.log
+logs/
+spring-shell.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+*.env.local
+application-local.yml
+application-secret.yml
+
+# Docker
+.docker/
+
+# Test output
+/test-results/
+/surefire-reports/

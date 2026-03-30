@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/api/v1/auth/**
+        - id: prescription-service
+          uri: http://prescription-service:8082
+          predicates:
+            - Path=/api/v1/receitas/**,/api/v1/admin/receitas/**
+        - id: evidence-service
+          uri: http://evidence-service:8083
+          predicates:
+            - Path=/api/v1/evidencias/**
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+jwt:
+  public-key: ${JWT_PUBLIC_KEY:}
