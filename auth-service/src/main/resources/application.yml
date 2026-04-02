@@ -32,8 +32,9 @@ spring:
     baseline-on-migrate: true
 
 jwt:
-  secret: ${JWT_SECRET:sus-receita-jwt-secret-key-minimum-32-characters-long}
-  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  private-key: ${JWT_PRIVATE_KEY}
+  public-key: ${JWT_PUBLIC_KEY}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
   refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
 
 management:
