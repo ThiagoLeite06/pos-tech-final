@@ -113,6 +113,17 @@ cd pos-tech-final
 
 O Auth Service assina tokens com a chave privada; o API Gateway valida com a pública.
 
+**Opção recomendada — script automático:**
+
+```bash
+./docker/generate-keys.sh
+```
+
+O script gera o par de chaves RSA 2048-bit no formato correto (PKCS#8 DER para privada, X.509 DER para pública), converte para Base64 e escreve automaticamente no arquivo `.env` na raiz do projeto. Cada desenvolvedor precisa rodar isso uma única vez.
+
+<details>
+<summary>Gerar manualmente (alternativa)</summary>
+
 ```bash
 # Gera chave privada RSA 2048 bits
 openssl genrsa -out jwt_private.pem 2048
@@ -125,14 +136,16 @@ export JWT_PRIVATE_KEY=$(cat jwt_private.pem | base64 | tr -d '\n')
 export JWT_PUBLIC_KEY=$(cat jwt_public.pem | base64 | tr -d '\n')
 ```
 
-### 3. Crie o arquivo `.env`
+</details>
 
-Na raiz do projeto, crie um arquivo `.env` com as variáveis sensíveis. Este arquivo está no `.gitignore` e **nunca deve ser commitado**.
+### 3. Verifique o arquivo `.env`
+
+O script cria/atualiza o `.env` automaticamente. Se precisar adicionar variáveis extras, edite-o diretamente. Este arquivo está no `.gitignore` e **nunca deve ser commitado**.
 
 ```bash
-# .env
-JWT_PRIVATE_KEY=<valor exportado acima>
-JWT_PUBLIC_KEY=<valor exportado acima>
+# .env (gerado pelo script — não commitar)
+JWT_PRIVATE_KEY=<gerado automaticamente>
+JWT_PUBLIC_KEY=<gerado automaticamente>
 
 # Opcional — sobrescreve os defaults do docker-compose
 DB_PASSWORD=susreceita123
@@ -179,6 +192,82 @@ docker compose up postgres kafka zookeeper
 
 # API Gateway
 ./gradlew :api-gateway:bootRun
+```
+
+---
+
+## Testando a Autenticação
+
+O banco de dados é inicializado com três usuários de teste via Flyway (`V3__seed_users.sql`). Todos usam a senha `senha123`.
+
+| CPF | Nome | Perfil |
+|---|---|---|
+| `12345678901` | Paciente Teste | `PATIENT` |
+| `98765432100` | Revisor Teste | `REVIEWER` |
+| `11122233344` | Admin Teste | `ADMIN` |
+
+Com a stack rodando (`docker compose up --build`), execute o fluxo completo:
+
+### 1. Login
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"cpf":"12345678901","password":"senha123"}' | jq
+```
+
+Resposta esperada:
+
+```json
+{
+  "accessToken": "eyJhbGciOiJSUzI1NiJ9...",
+  "refreshToken": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "expiresIn": 3600,
+  "role": "PATIENT"
+}
+```
+
+### 2. Usar o token em uma rota protegida
+
+```bash
+ACCESS_TOKEN="<accessToken retornado acima>"
+
+curl -s http://localhost:8080/api/v1/receitas \
+  -H "Authorization: Bearer $ACCESS_TOKEN" | jq
+```
+
+> Até o Prescription Service ser implementado, retorna 503. O importante é que o Gateway valide o token e roteia a requisição (não retorna 401).
+
+### 3. Renovar o access token
+
+O access token expira em 1 hora. Use o refresh token (válido por 7 dias) para renová-lo sem precisar fazer login novamente:
+
+```bash
+REFRESH_TOKEN="<refreshToken retornado no login>"
+
+curl -s -X POST http://localhost:8080/api/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d "{\"refreshToken\":\"$REFRESH_TOKEN\"}" | jq
+```
+
+### 4. Logout (revoga o refresh token)
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/auth/logout \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -d "{\"refreshToken\":\"$REFRESH_TOKEN\"}"
+# Resposta: 204 No Content
+```
+
+Após o logout, tentar usar o mesmo `refreshToken` retorna `401`.
+
+### Swagger UI
+
+Para explorar os endpoints do Auth Service interativamente:
+
+```
+http://localhost:8081/swagger-ui.html
 ```
 
 ---
