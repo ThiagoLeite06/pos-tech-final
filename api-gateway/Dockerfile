@@ -7,6 +7,7 @@ COPY gradle gradle
 COPY settings.gradle .
 COPY build.gradle .
 COPY api-gateway/build.gradle api-gateway/build.gradle
+COPY auth-service/build.gradle auth-service/build.gradle
 COPY api-gateway/src api-gateway/src
 
 RUN chmod +x gradlew && ./gradlew :api-gateway:bootJar -x test --no-daemon
