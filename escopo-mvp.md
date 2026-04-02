@@ -31,7 +31,7 @@
               v
       [API Gateway]
       Spring Cloud Gateway
-      JWT validation, rate limiting, static routing
+      JWT validation, rate limiting, static routing // JWT verifar a necessidade de JWT.
          |          |
          |          └──> [Auth Service]
          |                Spring Boot + PostgreSQL (schema: auth)

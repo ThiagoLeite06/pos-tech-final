@@ -1,3 +1,8 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
 # Maven
 target/
 *.class
@@ -49,3 +54,4 @@ application-secret.yml
 # Test output
 /test-results/
 /surefire-reports/
+.planning/
