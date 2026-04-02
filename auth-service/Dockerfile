@@ -6,8 +6,9 @@ COPY gradle gradle
 COPY settings.gradle .
 COPY build.gradle .
 COPY auth-service/build.gradle auth-service/build.gradle
+COPY api-gateway/build.gradle api-gateway/build.gradle
 COPY auth-service/src auth-service/src
-RUN ./gradlew :auth-service:bootJar --no-daemon -x test
+RUN chmod +x gradlew && ./gradlew :auth-service:bootJar --no-daemon -x test
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
