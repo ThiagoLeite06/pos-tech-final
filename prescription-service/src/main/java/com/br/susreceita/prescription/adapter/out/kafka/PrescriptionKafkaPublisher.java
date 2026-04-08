@@ -6,6 +6,7 @@ import com.br.susreceita.prescription.domain.model.Prescription;
 import com.br.susreceita.prescription.domain.port.out.PrescriptionEventPublisherPort;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
 
 @Component
 public class PrescriptionKafkaPublisher implements PrescriptionEventPublisherPort {
@@ -19,21 +20,20 @@ public class PrescriptionKafkaPublisher implements PrescriptionEventPublisherPor
     @Override
     public void publishPrescriptionRequest(Prescription prescription) {
         PrescriptionRequestEvent event = new PrescriptionRequestEvent(
-            prescription.getId(),
-            prescription.getPatientId(),
-            prescription.getCreatedAt()
+            prescription.id(),
+            prescription.patientId(),
+            prescription.medication(),
+            LocalDateTime.now()
         );
-        // TODO: Configure exact topic name and properties
         kafkaTemplate.send("PRESCRIPTION.REQUEST", event);
     }
 
     @Override
     public void publishPrescriptionStatus(Prescription prescription) {
         PrescriptionStatusEvent event = new PrescriptionStatusEvent(
-            prescription.getId(),
-            prescription.getStatus()
+            prescription.id(),
+            prescription.status()
         );
-        // TODO: Configure exact topic name and properties
         kafkaTemplate.send("PRESCRIPTION.STATUS", event);
     }
 }

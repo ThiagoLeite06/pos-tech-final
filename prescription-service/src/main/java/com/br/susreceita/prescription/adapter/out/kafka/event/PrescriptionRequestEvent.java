@@ -6,6 +6,7 @@ import java.util.UUID;
 public record PrescriptionRequestEvent(
     UUID prescriptionId,
     String patientId,
+    String medication,
     LocalDateTime requestedAt
     // TODO: Add other relevant fields
 ) {}

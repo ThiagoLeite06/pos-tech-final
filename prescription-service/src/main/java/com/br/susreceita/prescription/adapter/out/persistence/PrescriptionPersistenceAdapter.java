@@ -20,29 +20,23 @@ public class PrescriptionPersistenceAdapter implements PrescriptionRepositoryPor
     @Override
     public Prescription save(Prescription prescription) {
         PrescriptionEntity entity = new PrescriptionEntity(
-            prescription.getId(),
-            prescription.getPatientId(),
-            prescription.getStatus(),
-            prescription.getCreatedAt()
+            prescription.id(),
+            prescription.patientId(),
+            prescription.medication(),
+            prescription.status()
         );
-        
         PrescriptionEntity saved = repository.save(entity);
-        
-        return new Prescription(
-            saved.getId(),
-            saved.getPatientId(),
-            saved.getStatus(),
-            saved.getCreatedAt()
-        );
+        return new Prescription(saved.getId(), saved.getPatientId(), saved.getMedication(), saved.getStatus());
     }
 
     @Override
-    public Optional<Prescription> findById(UUID id) {
-        return repository.findById(id).map(entity -> new Prescription(
-            entity.getId(),
-            entity.getPatientId(),
-            entity.getStatus(),
-            entity.getCreatedAt()
-        ));
+    public Optional<Prescription> findById(String id) {
+        return repository.findById(UUID.fromString(id))
+            .map(entity -> new Prescription(
+                entity.getId(),
+                entity.getPatientId(),
+                entity.getMedication(),
+                entity.getStatus()
+            ));
     }
 }
