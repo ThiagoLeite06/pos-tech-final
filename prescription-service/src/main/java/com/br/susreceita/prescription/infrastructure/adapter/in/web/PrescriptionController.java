@@ -48,10 +48,11 @@ public class PrescriptionController {
         return ResponseEntity.of(getPrescriptionUseCase.getPrescription(id));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Prescription>> findAllByPatientId(){
+    @GetMapping("/patient/{id}")
+    public ResponseEntity<List<Prescription>> findAllByPatientId(@PathVariable String id, @RequestParam("page") int page,
+                                                                 @RequestParam("size") int size){
 
-        List<Prescription> prescriptions = listPatientPrescriptionsUseCase.listPatientPrescriptions("", 1, 5);
+        List<Prescription> prescriptions = listPatientPrescriptionsUseCase.listPatientPrescriptions(id, page, size);
         return ResponseEntity.ok(prescriptions);
     }
 
