@@ -1,13 +1,16 @@
 package com.br.susreceita.prescription.infrastructure.adapter.in.web;
 
+import com.br.susreceita.prescription.application.port.in.GetPrescriptionUseCase;
+import com.br.susreceita.prescription.application.port.in.ListPatientPrescriptionsUseCase;
 import com.br.susreceita.prescription.infrastructure.adapter.in.web.dto.PrescriptionRequest;
 import com.br.susreceita.prescription.domain.model.Prescription;
 import com.br.susreceita.prescription.application.port.in.CreatePrescriptionUseCase;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -15,9 +18,13 @@ import java.util.UUID;
 public class PrescriptionController {
 
     private final CreatePrescriptionUseCase createPrescriptionUseCase;
+    private final GetPrescriptionUseCase getPrescriptionUseCase;
+    private final ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase;
 
-    public PrescriptionController(CreatePrescriptionUseCase createPrescriptionUseCase) {
+    public PrescriptionController(CreatePrescriptionUseCase createPrescriptionUseCase, GetPrescriptionUseCase getPrescriptionUseCase, ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase) {
         this.createPrescriptionUseCase = createPrescriptionUseCase;
+        this.getPrescriptionUseCase = getPrescriptionUseCase;
+        this.listPatientPrescriptionsUseCase = listPatientPrescriptionsUseCase;
     }
 
     @PostMapping
@@ -35,4 +42,17 @@ public class PrescriptionController {
 
         return ResponseEntity.accepted().build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Prescription> findById(@PathVariable String id){
+        return ResponseEntity.of(getPrescriptionUseCase.getPrescription(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Prescription>> findAllByPatientId(){
+
+        List<Prescription> prescriptions = listPatientPrescriptionsUseCase.listPatientPrescriptions("", 1, 5);
+        return ResponseEntity.ok(prescriptions);
+    }
+
 }

@@ -3,8 +3,11 @@ package com.br.susreceita.prescription.infrastructure.adapter.out.persistence;
 import com.br.susreceita.prescription.infrastructure.adapter.out.persistence.entity.PrescriptionEntity;
 import com.br.susreceita.prescription.domain.model.Prescription;
 import com.br.susreceita.prescription.application.port.out.PrescriptionRepositoryPort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,5 +41,12 @@ public class PrescriptionPersistenceAdapter implements PrescriptionRepositoryPor
                 entity.getMedication(),
                 entity.getStatus()
             ));
+    }
+
+    @Override
+    public List<Prescription> findAllByPatientId(String patientId, int page, int size) {
+        return repository.findAllByPatientId(patientId, PageRequest.of(page, size)).stream().map(
+                entity -> new Prescription(entity.getId(), entity.getPatientId(), entity.getMedication(),
+                        entity.getStatus())).toList();
     }
 }

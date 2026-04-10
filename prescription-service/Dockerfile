@@ -9,7 +9,7 @@ COPY build.gradle .
 COPY prescription-service/build.gradle prescription-service/build.gradle
 COPY prescription-service/src prescription-service/src
 
-RUN chmod +x gradlew && ./gradlew :prescription-service:bootJar -x test --no-daemon
+RUN apk add --no-cache dos2unix && dos2unix gradlew && chmod +x gradlew && ./gradlew :prescription-service:bootJar -x test --no-daemon
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
