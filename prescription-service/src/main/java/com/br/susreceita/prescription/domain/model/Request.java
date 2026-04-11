@@ -12,6 +12,7 @@ public class Request {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID requestId;
 
     @Column(name = "patient_cpf")
