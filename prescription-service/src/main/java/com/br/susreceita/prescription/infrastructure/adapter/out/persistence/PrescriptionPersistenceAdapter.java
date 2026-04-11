@@ -1,7 +1,7 @@
 package com.br.susreceita.prescription.infrastructure.adapter.out.persistence;
 
+import com.br.susreceita.prescription.domain.model.Request;
 import com.br.susreceita.prescription.infrastructure.adapter.out.persistence.entity.PrescriptionEntity;
-import com.br.susreceita.prescription.domain.model.Prescription;
 import com.br.susreceita.prescription.application.port.out.PrescriptionRepositoryPort;
 import org.springframework.stereotype.Component;
 
@@ -18,25 +18,14 @@ public class PrescriptionPersistenceAdapter implements PrescriptionRepositoryPor
     }
 
     @Override
-    public Prescription save(Prescription prescription) {
-        PrescriptionEntity entity = new PrescriptionEntity(
-            prescription.id(),
-            prescription.patientId(),
-            prescription.medication(),
-            prescription.status()
-        );
+    public Request save(Request request) {
+        PrescriptionEntity entity = new PrescriptionEntity();
         PrescriptionEntity saved = repository.save(entity);
-        return new Prescription(saved.getId(), saved.getPatientId(), saved.getMedication(), saved.getStatus());
+        return new Request();
     }
 
     @Override
-    public Optional<Prescription> findById(String id) {
-        return repository.findById(UUID.fromString(id))
-            .map(entity -> new Prescription(
-                entity.getId(),
-                entity.getPatientId(),
-                entity.getMedication(),
-                entity.getStatus()
-            ));
+    public Optional<Request> findById(String id) {
+        return null;
     }
 }
