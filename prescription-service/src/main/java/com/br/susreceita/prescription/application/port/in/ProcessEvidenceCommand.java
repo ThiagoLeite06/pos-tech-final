@@ -14,8 +14,4 @@ public record ProcessEvidenceCommand(
     List<MedicineCommand> medicines,
     String obs,
     EvidenceStatus status
-) {
-    public List<RequestItem> toRequestItems() {
-
-    }
-}
+) { }
