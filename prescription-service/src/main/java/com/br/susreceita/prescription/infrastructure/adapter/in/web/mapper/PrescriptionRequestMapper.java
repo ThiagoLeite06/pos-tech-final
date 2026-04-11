@@ -6,6 +6,8 @@ import com.br.susreceita.prescription.domain.model.Request;
 import com.br.susreceita.prescription.infrastructure.adapter.in.web.dto.PrescriptionRequestDto;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class PrescriptionRequestMapper {
 
@@ -19,6 +21,7 @@ public class PrescriptionRequestMapper {
         request.setCpf(command.cpf());
         request.setNumSusCard(command.numSusCard());
         request.setStatus(EvidenceStatus.PENDING);
+        request.setCreatedAt(LocalDateTime.now());
 
         return request;
     }

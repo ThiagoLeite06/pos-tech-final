@@ -32,7 +32,7 @@ public class PrescriptionKafkaPublisher implements PrescriptionEventPublisherPor
     public void publishPrescriptionStatus(Request request) {
         PrescriptionStatusEvent event = new PrescriptionStatusEvent(
             request.getRequestId(),
-            EvidenceStatus.PENDING
+            request.getStatus()
         );
         kafkaTemplate.send("PRESCRIPTION.STATUS", event);
     }
