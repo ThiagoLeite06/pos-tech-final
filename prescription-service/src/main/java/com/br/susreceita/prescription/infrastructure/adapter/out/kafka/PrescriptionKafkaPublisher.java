@@ -1,5 +1,6 @@
 package com.br.susreceita.prescription.infrastructure.adapter.out.kafka;
 
+import com.br.susreceita.prescription.application.port.in.CreatePrescriptionCommand;
 import com.br.susreceita.prescription.domain.model.EvidenceStatus;
 import com.br.susreceita.prescription.infrastructure.adapter.out.kafka.event.PrescriptionRequestEvent;
 import com.br.susreceita.prescription.infrastructure.adapter.out.kafka.event.PrescriptionStatusEvent;
@@ -19,10 +20,10 @@ public class PrescriptionKafkaPublisher implements PrescriptionEventPublisherPor
     }
 
     @Override
-    public void publishPrescriptionRequest(Request request) {
+    public void publishPrescriptionRequest(CreatePrescriptionCommand command) {
         PrescriptionRequestEvent event = new PrescriptionRequestEvent(
-            request.getRequestId(),
-            ""
+            command.requestId(),
+            command.file()
         );
         kafkaTemplate.send("PRESCRIPTION.REQUEST", event);
     }
@@ -31,7 +32,7 @@ public class PrescriptionKafkaPublisher implements PrescriptionEventPublisherPor
     public void publishPrescriptionStatus(Request request) {
         PrescriptionStatusEvent event = new PrescriptionStatusEvent(
             request.getRequestId(),
-            EvidenceStatus.PENDING
+            request.getStatus()
         );
         kafkaTemplate.send("PRESCRIPTION.STATUS", event);
     }
