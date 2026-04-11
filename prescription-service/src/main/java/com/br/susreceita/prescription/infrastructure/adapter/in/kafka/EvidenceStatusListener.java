@@ -17,6 +17,6 @@ public class EvidenceStatusListener {
     @KafkaListener(topics = "EVIDENCE.STATUS", groupId = "prescription-service-group")
     public void consumeEvidenceStatus(EvidenceStatusEvent event) {
         // TODO: Map event to Domain input
-        processEvidenceStatusUseCase.processEvidenceStatus(event.evidenceId(), event.status());
+        processEvidenceStatusUseCase.processEvidenceStatus(event);
     }
 }

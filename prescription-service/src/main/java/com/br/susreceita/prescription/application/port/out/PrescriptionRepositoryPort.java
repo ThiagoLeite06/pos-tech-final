@@ -1,9 +1,10 @@
 package com.br.susreceita.prescription.application.port.out;
 
-import com.br.susreceita.prescription.domain.model.Prescription;
+import com.br.susreceita.prescription.domain.model.Request;
+
 import java.util.Optional;
 
 public interface PrescriptionRepositoryPort {
-    Prescription save(Prescription prescription);
-    Optional<Prescription> findById(String id);
+    Request save(Request request);
+    Optional<Request> findById(String id);
 }

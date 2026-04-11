@@ -1,10 +1,11 @@
 package com.br.susreceita.prescription.domain.service;
 
-import com.br.susreceita.prescription.domain.model.Prescription;
+import com.br.susreceita.prescription.domain.model.Request;
 import com.br.susreceita.prescription.application.port.in.CreatePrescriptionUseCase;
 import com.br.susreceita.prescription.application.port.in.ProcessEvidenceStatusUseCase;
 import com.br.susreceita.prescription.application.port.out.PrescriptionEventPublisherPort;
 import com.br.susreceita.prescription.application.port.out.PrescriptionRepositoryPort;
+import com.br.susreceita.prescription.infrastructure.adapter.in.kafka.event.EvidenceStatusEvent;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
 
     @Async
     @Override
-    public void createPrescriptionAsync(Prescription prescription) {
+    public void createPrescriptionAsync(Request request) {
         // TODO: Implement domain logic for creating prescription
         // Example: Save to DB
         // repositoryPort.save(prescription);
@@ -31,7 +32,7 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
     }
 
     @Override
-    public void processEvidenceStatus(String prescriptionId, String status) {
+    public void processEvidenceStatus(EvidenceStatusEvent event) {
         // TODO: Implement domain logic for processing evidence status
         // Example: Find in DB, update status, save, and publish new status
     }
