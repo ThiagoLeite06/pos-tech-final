@@ -13,14 +13,10 @@ import com.br.susreceita.prescription.application.port.out.PrescriptionEventPubl
 import com.br.susreceita.prescription.application.port.out.PrescriptionRepositoryPort;
 import com.br.susreceita.prescription.domain.model.RequestItem;
 import com.br.susreceita.prescription.infrastructure.adapter.in.web.mapper.PrescriptionRequestMapper;
-import org.hibernate.exception.DataException;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
@@ -88,9 +84,9 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
 
         if (!isValidated(command.status())) {
             originalRequest.get().setUpdateAt(LocalDateTime.now());
-        } else if(isReneable(command.prescriptionDate()) || originalRequest.get().getAttempts() > 2){
+        } else if(isRenewable(command.prescriptionDate()) || originalRequest.get().getAttempts() > 2){
             originalRequest.get().setPrescriptionDate(command.prescriptionDate());
-            originalRequest.get().setItems(this.reneableMedicines(originalRequest.get().getItems()));
+            originalRequest.get().setItems(this.renewableMedicines(originalRequest.get().getItems()));
             originalRequest.get().setStatus(EvidenceStatus.APPROVED);
             originalRequest.get().setUpdateAt(LocalDateTime.now());
         }else{
@@ -103,7 +99,7 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
 
     }
     
-    private boolean isReneable(Date prescriptionDate){
+    private boolean isRenewable(Date prescriptionDate){
         if (prescriptionDate == null) {
             return false;
         }
@@ -114,7 +110,7 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
         return prescriptionDate.before(currentDatePlus60);
     }
 
-    private List<RequestItem> reneableMedicines(List<RequestItem> medicineList){
+    private List<RequestItem> renewableMedicines(List<RequestItem> medicineList){
         for (RequestItem item : medicineList) {
             Optional<Drug> requestItem = this.drugRespositoryPort.findByName(item.getName());
             if(requestItem.isEmpty() ||
