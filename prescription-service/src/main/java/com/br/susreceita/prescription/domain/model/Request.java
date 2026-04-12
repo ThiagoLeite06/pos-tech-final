@@ -12,7 +12,7 @@ public class Request {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID requestId;
+    private UUID id;
 
     @Column(name = "patient_cpf")
     private String cpf;
@@ -52,7 +52,7 @@ public class Request {
     }
 
     public Request(UUID requestId, String cpf, String numSusCard, EvidenceStatus status, String fullName, String doctorCrm, Date prescriptionDate, LocalDateTime createdAt, LocalDateTime updateAt, Integer attempts, List<RequestItem> items) {
-        this.requestId = requestId;
+        this.id = requestId;
         this.cpf = cpf;
         this.numSusCard = numSusCard;
         this.status = status;
@@ -76,12 +76,12 @@ public class Request {
         updateAt = LocalDateTime.now();
     }
 
-    public UUID getRequestId() {
-        return requestId;
+    public UUID getId() {
+        return id;
     }
 
-    public void setRequestId(UUID requestId) {
-        this.requestId = requestId;
+    public void setId(UUID requestId) {
+        this.id = requestId;
     }
 
     public String getCpf() {

@@ -1,14 +1,11 @@
 package com.br.susreceita.prescription.domain.service;
 
+import com.br.susreceita.prescription.application.port.in.*;
 import com.br.susreceita.prescription.application.port.in.mapper.CommandToDomainMapper;
 import com.br.susreceita.prescription.application.port.out.DrugRespositoryPort;
 import com.br.susreceita.prescription.domain.model.Drug;
 import com.br.susreceita.prescription.domain.model.EvidenceStatus;
 import com.br.susreceita.prescription.domain.model.Request;
-import com.br.susreceita.prescription.application.port.in.CreatePrescriptionCommand;
-import com.br.susreceita.prescription.application.port.in.CreatePrescriptionUseCase;
-import com.br.susreceita.prescription.application.port.in.ProcessEvidenceCommand;
-import com.br.susreceita.prescription.application.port.in.ProcessEvidenceStatusUseCase;
 import com.br.susreceita.prescription.application.port.out.PrescriptionEventPublisherPort;
 import com.br.susreceita.prescription.application.port.out.PrescriptionRepositoryPort;
 import com.br.susreceita.prescription.domain.model.RequestItem;
@@ -18,13 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLDataException;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
-public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEvidenceStatusUseCase {
+public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEvidenceStatusUseCase, GetPrescriptionUseCase, ListPatientPrescriptionsUseCase {
 
     private final PrescriptionRepositoryPort repositoryPort;
     private final PrescriptionEventPublisherPort publisherPort;
@@ -52,12 +46,12 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
 
             // 3. Create a new command record with the updated requestId
             CreatePrescriptionCommand updatedCommand = new CreatePrescriptionCommand(
-                savedRequest.getRequestId(),
-                command.fullName(),
-                command.cpf(),
-                command.numSusCard(),
-                command.file(),
-                command.mimeType()
+                    savedRequest.getId(),
+                    command.fullName(),
+                    command.cpf(),
+                    command.numSusCard(),
+                    command.file(),
+                    command.mimeType()
             );
 
             // 4. Publish to Kafka with the ID included
@@ -98,7 +92,7 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
         this.publisherPort.publishPrescriptionStatus(originalRequest.get());
 
     }
-    
+
     private boolean isRenewable(Date prescriptionDate){
         if (prescriptionDate == null) {
             return false;
@@ -106,7 +100,7 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_YEAR, 60);
         Date currentDatePlus60 = calendar.getTime();
-        
+
         return prescriptionDate.before(currentDatePlus60);
     }
 
@@ -125,5 +119,15 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
 
     private boolean isValidated(EvidenceStatus status){
         return status == EvidenceStatus.VALIDATED;
+    }
+
+    @Override
+    public Optional<Request> getPrescription(UUID id) {
+        return repositoryPort.findById(id);
+    }
+
+    @Override
+    public List<Request> listPatientPrescriptions(String patientId, int page, int size) {
+        return repositoryPort.findAllByPatientCpf(patientId, page, size);
     }
 }
