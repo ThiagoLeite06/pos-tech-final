@@ -1,12 +1,12 @@
 package com.br.susreceita.prescription.infrastructure.adapter.out.kafka;
 
+import com.br.susreceita.prescription.application.port.in.CreatePrescriptionCommand;
 import com.br.susreceita.prescription.infrastructure.adapter.out.kafka.event.PrescriptionRequestEvent;
 import com.br.susreceita.prescription.infrastructure.adapter.out.kafka.event.PrescriptionStatusEvent;
-import com.br.susreceita.prescription.domain.model.Prescription;
+import com.br.susreceita.prescription.domain.model.Request;
 import com.br.susreceita.prescription.application.port.out.PrescriptionEventPublisherPort;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import java.time.LocalDateTime;
 
 @Component
 public class PrescriptionKafkaPublisher implements PrescriptionEventPublisherPort {
@@ -18,21 +18,19 @@ public class PrescriptionKafkaPublisher implements PrescriptionEventPublisherPor
     }
 
     @Override
-    public void publishPrescriptionRequest(Prescription prescription) {
+    public void publishPrescriptionRequest(CreatePrescriptionCommand command) {
         PrescriptionRequestEvent event = new PrescriptionRequestEvent(
-            prescription.id(),
-            prescription.patientId(),
-            prescription.medication(),
-            LocalDateTime.now()
+            command.requestId(),
+            command.file()
         );
         kafkaTemplate.send("PRESCRIPTION.REQUEST", event);
     }
 
     @Override
-    public void publishPrescriptionStatus(Prescription prescription) {
+    public void publishPrescriptionStatus(Request request) {
         PrescriptionStatusEvent event = new PrescriptionStatusEvent(
-            prescription.id(),
-            prescription.status()
+            request.getId(),
+            request.getStatus()
         );
         kafkaTemplate.send("PRESCRIPTION.STATUS", event);
     }
