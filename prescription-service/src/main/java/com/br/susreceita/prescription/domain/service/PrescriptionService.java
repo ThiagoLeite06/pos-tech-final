@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEvidenceStatusUseCase, GetPrescriptionUseCase, ListPatientPrescriptionsUseCase {
+public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEvidenceStatusUseCase,
+        GetPrescriptionUseCase, ListPatientPrescriptionsUseCase, ListPrescriptionsInPendingReviewUseCase {
 
     private final PrescriptionRepositoryPort repositoryPort;
     private final PrescriptionEventPublisherPort publisherPort;
@@ -129,5 +130,10 @@ public class PrescriptionService implements CreatePrescriptionUseCase, ProcessEv
     @Override
     public List<Request> listPatientPrescriptions(String patientId, int page, int size) {
         return repositoryPort.findAllByPatientCpf(patientId, page, size);
+    }
+
+    @Override
+    public List<Request> listPrescriptionsInPendingReview(int page, int size) {
+        return repositoryPort.findAllPendingPrescriptions(page, size);
     }
 }
