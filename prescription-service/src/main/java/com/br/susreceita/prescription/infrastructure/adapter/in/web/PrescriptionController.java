@@ -1,11 +1,8 @@
 package com.br.susreceita.prescription.infrastructure.adapter.in.web;
 
-import com.br.susreceita.prescription.application.port.in.GetPrescriptionUseCase;
-import com.br.susreceita.prescription.application.port.in.ListPatientPrescriptionsUseCase;
+import com.br.susreceita.prescription.application.port.in.*;
 import com.br.susreceita.prescription.domain.model.Request;
 import com.br.susreceita.prescription.infrastructure.adapter.in.web.dto.PrescriptionRequestDto;
-import com.br.susreceita.prescription.application.port.in.CreatePrescriptionCommand;
-import com.br.susreceita.prescription.application.port.in.CreatePrescriptionUseCase;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +21,13 @@ public class PrescriptionController {
     private final CreatePrescriptionUseCase createPrescriptionUseCase;
     private final GetPrescriptionUseCase getPrescriptionUseCase;
     private final ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase;
+    private final ListPrescriptionsInPendingReviewUseCase listPrescriptionsInPendingReviewUseCase;
 
-    public PrescriptionController(CreatePrescriptionUseCase createPrescriptionUseCase, GetPrescriptionUseCase getPrescriptionUseCase, ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase) {
+    public PrescriptionController(CreatePrescriptionUseCase createPrescriptionUseCase, GetPrescriptionUseCase getPrescriptionUseCase, ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase, ListPrescriptionsInPendingReviewUseCase listPrescriptionsInPendingReviewUseCase) {
         this.createPrescriptionUseCase = createPrescriptionUseCase;
         this.getPrescriptionUseCase = getPrescriptionUseCase;
         this.listPatientPrescriptionsUseCase = listPatientPrescriptionsUseCase;
+        this.listPrescriptionsInPendingReviewUseCase = listPrescriptionsInPendingReviewUseCase;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -68,6 +67,14 @@ public class PrescriptionController {
                                                             @RequestParam(value = "size", defaultValue = "10") int size){
 
         List<Request> prescriptions = listPatientPrescriptionsUseCase.listPatientPrescriptions(id, page, size);
+        return ResponseEntity.ok(prescriptions);
+    }
+
+    @GetMapping("/review")
+    public ResponseEntity<List<Request>> findAllPendingPrescriptions(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                     @RequestParam(value = "size", defaultValue = "10") int size) {
+        List<Request> prescriptions = listPrescriptionsInPendingReviewUseCase.listPrescriptionsInPendingReview(page, size);
+
         return ResponseEntity.ok(prescriptions);
     }
 }

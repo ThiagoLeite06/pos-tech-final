@@ -32,4 +32,9 @@ public class PrescriptionPersistenceAdapter implements PrescriptionRepositoryPor
     public List<Request> findAllByPatientCpf(String cpf, int page, int size) {
         return repository.findAllByCpf(cpf, PageRequest.of(page, size));
     }
+
+    @Override
+    public List<Request> findAllPendingPrescriptions(int page, int size) {
+        return repository.findAllPendingPrescriptions(PageRequest.of(page, size));
+    }
 }
