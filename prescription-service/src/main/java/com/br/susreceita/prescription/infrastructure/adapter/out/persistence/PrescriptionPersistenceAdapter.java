@@ -1,5 +1,6 @@
 package com.br.susreceita.prescription.infrastructure.adapter.out.persistence;
 
+import com.br.susreceita.prescription.domain.model.EvidenceStatus;
 import com.br.susreceita.prescription.domain.model.Request;
 import com.br.susreceita.prescription.application.port.out.PrescriptionRepositoryPort;
 import org.springframework.data.domain.PageRequest;
@@ -36,5 +37,10 @@ public class PrescriptionPersistenceAdapter implements PrescriptionRepositoryPor
     @Override
     public List<Request> findAllPendingPrescriptions(int page, int size) {
         return repository.findAllPendingPrescriptions(PageRequest.of(page, size));
+    }
+
+    @Override
+    public void updatePrescriptionStatus(UUID id, EvidenceStatus status) {
+        repository.updateStatus(id, status);
     }
 }

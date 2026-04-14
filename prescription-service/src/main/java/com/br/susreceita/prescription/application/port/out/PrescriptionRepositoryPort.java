@@ -1,7 +1,7 @@
 package com.br.susreceita.prescription.application.port.out;
 
+import com.br.susreceita.prescription.domain.model.EvidenceStatus;
 import com.br.susreceita.prescription.domain.model.Request;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,4 +12,5 @@ public interface PrescriptionRepositoryPort {
     Optional<Request> findById(UUID id);
     List<Request> findAllByPatientCpf(String cpf, int page, int size);
     List<Request> findAllPendingPrescriptions(int page, int size);
+    void updatePrescriptionStatus(UUID id, EvidenceStatus status);
 }
