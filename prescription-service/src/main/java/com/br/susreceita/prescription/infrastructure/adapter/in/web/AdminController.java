@@ -36,7 +36,7 @@ public class AdminController {
 
         blockDrugUseCase.blockDrug(blockedDrug);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Droga adicionada na lista de bloqueios");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Medicamento adicionado na lista de bloqueios");
     }
 
     @GetMapping
