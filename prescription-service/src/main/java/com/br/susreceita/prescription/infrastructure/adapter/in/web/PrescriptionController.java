@@ -3,8 +3,12 @@ package com.br.susreceita.prescription.infrastructure.adapter.in.web;
 import com.br.susreceita.prescription.application.port.in.*;
 import com.br.susreceita.prescription.domain.model.Request;
 import com.br.susreceita.prescription.infrastructure.adapter.in.web.dto.PrescriptionRequestDto;
+import com.br.susreceita.prescription.infrastructure.adapter.in.web.dto.ReviewPrescriptionRequestDto;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,22 +19,25 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/prescription")
+@RequestMapping("/api/v1/receitas")
 public class PrescriptionController {
 
     private final CreatePrescriptionUseCase createPrescriptionUseCase;
     private final GetPrescriptionUseCase getPrescriptionUseCase;
     private final ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase;
     private final ListPrescriptionsInPendingReviewUseCase listPrescriptionsInPendingReviewUseCase;
+    private final ReviewPrescriptionUseCase reviewPrescriptionUseCase;
 
-    public PrescriptionController(CreatePrescriptionUseCase createPrescriptionUseCase, GetPrescriptionUseCase getPrescriptionUseCase, ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase, ListPrescriptionsInPendingReviewUseCase listPrescriptionsInPendingReviewUseCase) {
+    public PrescriptionController(CreatePrescriptionUseCase createPrescriptionUseCase, GetPrescriptionUseCase getPrescriptionUseCase, ListPatientPrescriptionsUseCase listPatientPrescriptionsUseCase, ListPrescriptionsInPendingReviewUseCase listPrescriptionsInPendingReviewUseCase, ReviewPrescriptionUseCase reviewPrescriptionUseCase) {
         this.createPrescriptionUseCase = createPrescriptionUseCase;
         this.getPrescriptionUseCase = getPrescriptionUseCase;
         this.listPatientPrescriptionsUseCase = listPatientPrescriptionsUseCase;
         this.listPrescriptionsInPendingReviewUseCase = listPrescriptionsInPendingReviewUseCase;
+        this.reviewPrescriptionUseCase = reviewPrescriptionUseCase;
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('PATIENT')")
+    @PostMapping(value = "/solicitacoes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createPrescription(@RequestPart("file") MultipartFile file,
                                                      @RequestPart("prescription") PrescriptionRequestDto request) {
         try{
@@ -56,21 +63,34 @@ public class PrescriptionController {
         return ResponseEntity.accepted().body("Renovação de prescrição enviada para analise.");
     }
 
+    @PreAuthorize("hasAnyRole('PATIENT', 'REVIEWER')")
     @GetMapping("/{id}")
     public ResponseEntity<Request> findById(@PathVariable UUID id){
         return ResponseEntity.of(getPrescriptionUseCase.getPrescription(id));
     }
 
-    @GetMapping("/patient/{id}")
-    public ResponseEntity<List<Request>> findAllByPatientId(@PathVariable String id,
+    @PreAuthorize("hasRole('PATIENT')")
+    @GetMapping
+    public ResponseEntity<List<Request>> findAllByPatientId(@AuthenticationPrincipal Jwt jwt,
                                                             @RequestParam(value = "page", defaultValue = "0") int page,
                                                             @RequestParam(value = "size", defaultValue = "10") int size){
 
-        List<Request> prescriptions = listPatientPrescriptionsUseCase.listPatientPrescriptions(id, page, size);
+        String cpf = jwt.getClaim("cpf");
+
+        List<Request> prescriptions = listPatientPrescriptionsUseCase.listPatientPrescriptions(cpf, page, size);
         return ResponseEntity.ok(prescriptions);
     }
 
-    @GetMapping("/review")
+    @PreAuthorize("hasRole('REVIEWER')")
+    @PatchMapping("/solicitacoes/{id}/revisar")
+    public ResponseEntity<Void> reviewPrescription(@PathVariable UUID id, @RequestBody ReviewPrescriptionRequestDto dto){
+
+        reviewPrescriptionUseCase.reviewPrescription(id, dto.status().getStatus());
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAnyRole('REVIEWER', 'ADMIN')")
+    @GetMapping("/revisao")
     public ResponseEntity<List<Request>> findAllPendingPrescriptions(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                      @RequestParam(value = "size", defaultValue = "10") int size) {
         List<Request> prescriptions = listPrescriptionsInPendingReviewUseCase.listPrescriptionsInPendingReview(page, size);

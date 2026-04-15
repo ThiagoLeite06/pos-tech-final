@@ -70,9 +70,15 @@ services:
         condition: service_healthy
     command: |
       cub kafka-ready -b kafka:9092 1 20;
-
+      
       kafka-topics --create --if-not-exists \
-        --topic EVIDENCE.STATUS \
+        --topic PRESCRIPTION.REQUEST \
+        --bootstrap-server kafka:9092 \
+        --partitions 1 \
+        --replication-factor 1;
+      
+      kafka-topics --create --if-not-exists \
+        --topic PRESCRIPTION.STATUS \
         --bootstrap-server kafka:9092 \
         --partitions 1 \
         --replication-factor 1;
