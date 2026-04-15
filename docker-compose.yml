@@ -30,11 +30,11 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    healthcheck:
-      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    #healthcheck:
+    #  test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+    #  interval: 10s
+    #  timeout: 5s
+    #  retries: 5
     networks:
       - sus-network
 
@@ -44,12 +44,11 @@ services:
     ports:
       - "9092:9092"
     depends_on:
-      zookeeper:
-        condition: service_healthy
+      - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -62,6 +61,27 @@ services:
       retries: 5
     networks:
       - sus-network
+
+  kafka-create-topics:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: init-kafka-topics
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: |
+      cub kafka-ready -b kafka:9092 1 20;
+
+      kafka-topics --create --if-not-exists \
+        --topic EVIDENCE.STATUS \
+        --bootstrap-server kafka:9092 \
+        --partitions 1 \
+        --replication-factor 1;
+      
+
+      "
+    networks:
+      - sus-network
+    restart: no
 
   api-gateway:
     build:
@@ -104,6 +124,36 @@ services:
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - sus-network
+
+  prescription-service:
+    build:
+      context: .
+      dockerfile: prescription-service/Dockerfile
+    container_name: sus-prescription-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      kafka-create-topics:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: susreceita
+      DB_USER: susreceita
+      DB_PASSWORD: susreceita123
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 5

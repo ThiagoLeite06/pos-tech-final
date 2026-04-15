@@ -10,7 +10,7 @@ COPY api-gateway/build.gradle api-gateway/build.gradle
 COPY auth-service/build.gradle auth-service/build.gradle
 COPY api-gateway/src api-gateway/src
 
-RUN chmod +x gradlew && ./gradlew :api-gateway:bootJar -x test --no-daemon
+RUN apk add --no-cache dos2unix && dos2unix gradlew && chmod +x gradlew && ./gradlew :api-gateway:bootJar -x test --no-daemon
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
