@@ -16,12 +16,29 @@ subprojects {
         }
     }
 
+    ext {
+        set('springAiVersion', "1.1.4")
+    }
+
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+    }
+
     // Spring Boot BOM é gerido automaticamente pelo plugin spring-boot em cada subprojeto.
     // Aqui importamos apenas os BOMs adicionais necessários.
     dependencyManagement {
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.3"
             mavenBom "org.testcontainers:testcontainers-bom:1.20.1"
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
         }
     }
 
