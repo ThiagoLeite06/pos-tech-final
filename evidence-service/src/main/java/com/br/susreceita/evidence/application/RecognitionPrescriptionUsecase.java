@@ -19,11 +19,10 @@ public class RecognitionPrescriptionUsecase {
         this.evidenceResultGateway = evidenceResultGateway;
     }
 
-    public Evidence recognizePrescription(EvidenceDto evidenceDto) {
+    public void recognizePrescription(EvidenceDto evidenceDto) {
         RecognitionPrescription extracted = ocrEngineGateway.recognize(evidenceDto.image64());
         Evidence evidence = mapToEvidence(evidenceDto, extracted);
         evidenceResultGateway.save(evidence);
-        return evidence;
     }
     
     private Evidence mapToEvidence(EvidenceDto evidenceDto, RecognitionPrescription extracted) {
