@@ -10,6 +10,7 @@ public class RequestItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID requestItemId;
 
     // Relacionamento N:1 - Muitos itens pertencem a uma requisição
