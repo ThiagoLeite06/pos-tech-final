@@ -340,7 +340,7 @@ Todos os endpoints passam pelo API Gateway em `http://localhost:8080`. O header 
 | `GET` | `/api/v1/receitas/{id}` | Consulta status e histórico de uma solicitação | `PATIENT`, `REVIEWER` |
 | `GET` | `/api/v1/receitas` | Lista solicitações do paciente autenticado (paginado) | `PATIENT` |
 | `PATCH` | `/api/v1/receitas/solicitacoes/{id}/revisar` | Revisor aprova ou rejeita caso em revisão manual | `REVIEWER` |
-| `GET` | `/api/v1/admin/receitas/revisao` | Lista solicitações em fila de revisão manual | `REVIEWER`, `ADMIN` |
+| `GET` | `/api/v1/receitas/receitas/revisao` | Lista solicitações em fila de revisão manual | `REVIEWER`, `ADMIN` |
 | `GET` | `/api/v1/admin/receitas/bloqueios` | Lista medicamentos bloqueados | `ADMIN` |
 | `POST` | `/api/v1/admin/receitas/bloqueios` | Adiciona medicamento à lista de bloqueio | `ADMIN` |
 | `DELETE` | `/api/v1/admin/receitas/bloqueios/{codigo}` | Remove medicamento da lista de bloqueio | `ADMIN` |
