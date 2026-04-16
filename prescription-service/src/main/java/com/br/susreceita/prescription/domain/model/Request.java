@@ -2,7 +2,7 @@ package com.br.susreceita.prescription.domain.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +13,7 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID requestId;
+    private UUID id;
 
     @Column(name = "patient_cpf")
     private String cpf;
@@ -30,9 +30,8 @@ public class Request {
     @Column(name = "doctor_crm")
     private String doctorCrm;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "prescription_date")
-    private Date prescriptionDate;
+    private LocalDate prescriptionDate;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -42,7 +41,7 @@ public class Request {
 
     @Version
     @Column(name = "attempts_count")
-    private Integer attempts;
+    private Integer attempts = 0;
 
     // Relacionamento 1:N - Uma requisição tem vários itens
     // mappedBy indica o nome do atributo na classe RequestItem
@@ -52,8 +51,8 @@ public class Request {
     public Request() {
     }
 
-    public Request(UUID requestId, String cpf, String numSusCard, EvidenceStatus status, String fullName, String doctorCrm, Date prescriptionDate, LocalDateTime createdAt, LocalDateTime updateAt, Integer attempts, List<RequestItem> items) {
-        this.id = requestId;
+    public Request(UUID id, String cpf, String numSusCard, EvidenceStatus status, String fullName, String doctorCrm, LocalDate prescriptionDate, LocalDateTime createdAt, LocalDateTime updateAt, Integer attempts, List<RequestItem> items) {
+        this.id = id;
         this.cpf = cpf;
         this.numSusCard = numSusCard;
         this.status = status;
@@ -125,11 +124,11 @@ public class Request {
         this.doctorCrm = doctorCrm;
     }
 
-    public Date getPrescriptionDate() {
+    public LocalDate getPrescriptionDate() {
         return prescriptionDate;
     }
 
-    public void setPrescriptionDate(Date prescriptionDate) {
+    public void setPrescriptionDate(LocalDate prescriptionDate) {
         this.prescriptionDate = prescriptionDate;
     }
 
